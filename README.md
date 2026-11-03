@@ -65,3 +65,14 @@ brew install --cask oliverames/tap/supercharge
 ```sh
 brew install oliverames/tap/frames-cli
 ```
+
+## RemCTL
+
+[RemCTL](https://github.com/viticci/remctl) by MacStories is an Apple Reminders command-line tool and MCP server. This cask wraps RemCTL's own installer: it downloads the matching signed release, checks it against a pinned checksum, and runs the installer, which asks for your administrator password.
+
+```sh
+brew install --cask oliverames/tap/remctl-macstories
+```
+
+The cask is named `remctl-macstories` because Homebrew's `remctl` formula is an unrelated remote-execution tool. Uninstalling the cask does not remove RemCTL; use `uninstall.sh --keep-config` from the matching source release for that.
+
