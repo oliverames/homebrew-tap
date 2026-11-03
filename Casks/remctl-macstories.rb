@@ -18,42 +18,44 @@ cask "remctl-macstories" do
   # RemCTL ships its own transactional installer: it puts the signed Capability
   # Host in ~/Applications, installs a root-owned Python under /Library/RemCTL,
   # and manages a LaunchAgent. This cask downloads the matching signed release,
-  # checks it against a pinned checksum, and hands it to that installer.
-  # The installer asks for your administrator password. Its writes (home
-  # directory, /Library, launchd) cannot run inside the sandbox that the
-  # declarative postflight_steps use, so this relies on the legacy block.
-  postflight do
-    dmg_sha256 = "7f12f11308c6ef32410d11b56c41d7343ac8d702a928c8584cf7921490428dbd"
-    dmg = staged_path/"RemCTL-arm64.dmg"
-    mount = staged_path/"dmg"
+  # checks it against a pinned checksum, and hands it to that installer, which
+  # asks for your administrator password. Installer scripts run outside the cask
+  # sandbox, which the installer's writes to /Library and launchd require.
+  installer script: {
+    executable: "/bin/bash",
+    args:       [
+      "-c",
+      <<~'BASH',
+        set -euo pipefail
+        staged="$1"
+        version="$2"
+        dmg_sha256="7f12f11308c6ef32410d11b56c41d7343ac8d702a928c8584cf7921490428dbd"
+        dmg="$staged/RemCTL-arm64.dmg"
+        mount="$staged/dmg"
+        /usr/bin/curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+          --output "$dmg" "https://github.com/viticci/remctl/releases/download/v${version}/RemCTL-arm64.dmg"
+        echo "${dmg_sha256}  ${dmg}" | /usr/bin/shasum -a 256 -c -
+        /usr/bin/hdiutil attach -readonly -nobrowse -quiet -mountpoint "$mount" "$dmg"
+        trap '/usr/bin/hdiutil detach -quiet "$mount" || true' EXIT
+        "$staged/remctl-${version}/install.sh" --prebuilt "$mount/RemCTL Capability Host.app" --doctor
+      BASH
+      "remctl-installer",
+      staged_path.to_s,
+      version.to_s,
+    ],
+  }
 
-    system_command "/usr/bin/curl",
-                   args: [
-                     "--fail", "--location", "--silent", "--show-error",
-                     "--proto", "=https", "--tlsv1.2",
-                     "--output", dmg,
-                     "https://github.com/viticci/remctl/releases/download/v#{version}/RemCTL-arm64.dmg"
-                   ]
-    raise "RemCTL-arm64.dmg does not match the pinned checksum" if Digest::SHA256.file(dmg).hexdigest != dmg_sha256
-
-    system_command "/usr/bin/hdiutil",
-                   args: ["attach", "-readonly", "-nobrowse", "-quiet", "-mountpoint", mount, dmg]
-    begin
-      system_command "#{staged_path}/remctl-#{version}/install.sh",
-                     args:         ["--prebuilt", mount/"RemCTL Capability Host.app", "--doctor"],
-                     print_stdout: true
-    ensure
-      system_command "/usr/bin/hdiutil", args: ["detach", "-quiet", mount]
-    end
-  end
+  # Required beside an installer stanza. Quitting the host is harmless: its
+  # LaunchAgent restarts it, and RemCTL's files stay in place.
+  uninstall quit: "net.macstories.remctl.capability-host"
 
   caveats <<~EOS
     This cask runs RemCTL's own installer, which asks for your administrator
     password. For a first install, finish setup with:
       remctl onboard
 
-    Uninstalling this cask does not remove RemCTL, because Homebrew also runs
-    uninstall steps during an upgrade. To remove RemCTL itself, run
+    Uninstalling this cask does not remove RemCTL itself, because Homebrew also
+    runs uninstall steps during an upgrade. To remove RemCTL, run
     uninstall.sh --keep-config from the matching source release.
   EOS
 end
