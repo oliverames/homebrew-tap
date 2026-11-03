@@ -52,6 +52,7 @@ Casks for apps made by other developers that Homebrew's main cask repository doe
 | `local-code` | [Local Code](https://getlocalcode.app), private AI agent for Apple Silicon |
 | `mapc` | [MaPC](https://mapc.games), Windows PC games on Apple Silicon Macs |
 | `supercharge` | [Supercharge](https://sindresorhus.com/supercharge), opt-in macOS fixes |
+| `tinystart` | [TinyStart](https://tinystart.app), tiny launcher and emoji picker |
 
 ```sh
 brew install --cask oliverames/tap/supercharge
