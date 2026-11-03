@@ -39,3 +39,20 @@ brew uninstall --cask oliverames/tap/image-relay
 # also delete preferences and caches
 brew uninstall --zap --cask oliverames/tap/image-relay
 ```
+
+## Third-party apps
+
+Casks for apps made by other developers that Homebrew's main cask repository doesn't carry. They point at each developer's own download and follow its Sparkle update feed.
+
+| Cask | App |
+|---|---|
+| `element-photo` | [Element](https://elementphoto.app), photo library and RAW editor |
+| `jetty-pro` | [Jetty Pro](https://hypercritical.co/jetty-pro/), floating Dock-like palettes |
+| `kier` | [Kier](https://getkier.com), tracks promises found in your chats |
+| `local-code` | [Local Code](https://getlocalcode.app), private AI agent for Apple Silicon |
+| `mapc` | [MaPC](https://mapc.games), Windows PC games on Apple Silicon Macs |
+| `supercharge` | [Supercharge](https://sindresorhus.com/supercharge), opt-in macOS fixes |
+
+```sh
+brew install --cask oliverames/tap/supercharge
+```
