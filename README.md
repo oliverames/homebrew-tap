@@ -57,3 +57,11 @@ Casks for apps made by other developers that Homebrew's main cask repository doe
 ```sh
 brew install --cask oliverames/tap/supercharge
 ```
+
+## frames-cli
+
+[frames-cli](https://github.com/viticci/frames-cli) by Federico Viticci frames screenshots and screen recordings with official Apple device bezels. This formula installs the tagged release with Python and Pillow.
+
+```sh
+brew install oliverames/tap/frames-cli
+```
